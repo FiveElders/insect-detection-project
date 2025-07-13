@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <!-- إضافة Favicon للموقع -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+
+    <title>معالجة الصور</title>
+</head>
+<body>
+    <header>
+        <h1>رفع صورة لتحليل الكائنات</h1>
+    </header>
+
+    <div class="container">
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <button type="submit">رفع الصورة</button>
+        </form>
+
+        <div id="results" class="hidden">
+            <h2>النتائج:</h2>
+            <div class="results">
+                <div>
+                    <h3>الصورة الأصلية</h3>
+                    <a id="original-download" href="#" download="original-image.jpg">
+                        <img id="original-image" alt="الصورة الأصلية" onclick="openModal(this)">
+                    </a>
+                </div>
+                <div>
+                    <h3>الصورة المعدلة</h3>
+                    <a id="processed-download" href="#" download="processed-image.jpg">
+                        <img id="processed-image" alt="الصورة المعدلة" onclick="openModal(this)">
+                    </a>
+                </div>
+                <div>
+                    <h3>الرسم البياني</h3>
+                    <a id="plot-download" href="#" download="plot-image.jpg">
+                        <img id="plot-image" alt="الرسم البياني" onclick="openModal(this)">
+                    </a>
+                </div>
+            </div>
+            <h3>التصنيفات:</h3>
+            <div id="class-counts"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <!-- نافذة عرض الصورة المكبرة -->
+    <div id="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img id="modal-image" src="" alt="صورة مكبرة">
+        <a id="modal-download" href="#" download="modal-image.jpg">
+            <button class="download-btn">تنزيل الصورة</button>
+        </a>
+    </div>
+
+    <script>
+        const form = document.getElementById('upload-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('/process', { method: 'POST', body: formData });
+            const data = await response.json();
+
+            // تحديث الصور وعناصر التحميل
+            document.getElementById('original-image').src = data.original;
+            document.getElementById('processed-image').src = data.processed;
+            document.getElementById('plot-image').src = data.plot;
+
+            // تحديث روابط التحميل
+            document.getElementById('original-download').href = data.original;
+            document.getElementById('processed-download').href = data.processed;
+            document.getElementById('plot-download').href = data.plot;
+
+            // عرض النتائج
+            const classCounts = data.class_counts;
+            const classCountsDiv = document.getElementById('class-counts');
+            classCountsDiv.innerHTML = '';
+            for (const [label, count] of Object.entries(classCounts)) {
+                classCountsDiv.innerHTML += `<p>${label}: ${count}</p>`;
+            }
+
+            document.getElementById('results').classList.remove('hidden');
+        };
+
+        // فتح الصورة المكبرة
+        function openModal(imgElement) {
+            const modal = document.getElementById('modal');
+            const modalImage = document.getElementById('modal-image');
+            const downloadButton = document.getElementById('modal-download');
+
+            modalImage.src = imgElement.src;
+            downloadButton.href = imgElement.src;  // تحديث رابط التنزيل للصورة المكبرة
+            modal.style.display = 'flex';
+        }
+
+        // إغلاق الصورة المكبرة
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
