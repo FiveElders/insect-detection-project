@@ -24,16 +24,6 @@ The system uses drone-captured images of pheromone traps placed across the farm 
   - mAP@0.5 for detection accuracy
   - Counting accuracy vs human labels
 
-### 🏷️ Sample Labels Format
-
-```json
-{
-  "filename": "trap_grid_03.jpg",
-  "annotations": [
-    {"x": 120, "y": 85, "width": 30, "height": 28},
-    {"x": 300, "y": 140, "width": 25, "height": 25}
-  ]
-}
 🧪 Training Pipeline
 Data preprocessing (resize, normalize)
 
@@ -49,3 +39,14 @@ Over six diffrent insect types
 Manual labeling using tools like LabelImg or CVAT
 
 Augmentation: rotation, blur, brightness adjustments
+
+### 🏷️ Sample Labels Format
+```json
+{
+  "filename": "trap_grid_03.jpg",
+  "annotations": [
+    {"x": 120, "y": 85, "width": 30, "height": 28},
+    {"x": 300, "y": 140, "width": 25, "height": 25}
+  ]
+}
+
